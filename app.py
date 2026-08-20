@@ -1,11 +1,4 @@
-"""
-Streamlit UI for the AI Research System.
 
-Run with:
-    .venv\\Scripts\\streamlit.exe run app.py
-  or
-    .venv\\Scripts\\python.exe -m streamlit run app.py
-"""
 
 import os
 import sys
