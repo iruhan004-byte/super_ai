@@ -20,7 +20,7 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
 
 # Page config (must be first Streamlit call)
 st.set_page_config(
-    page_title="AI Research System",
+    page_title="HYBRID AI System",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded",
