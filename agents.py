@@ -1,14 +1,4 @@
-"""
-Multi-agent research pipeline — each agent runs on the model best suited to it:
 
-  Planner      -> breaks the question into sub-questions        (Groq/Llama, fast)
-  Researcher   -> searches + gathers evidence per sub-question   (DuckDuckGo)
-  Synthesizer  -> writes the final report from all evidence      (Gemini, long context)
-  Critic       -> checks the report for gaps/contradictions      (OpenRouter free-router)
-
-Each function is independent, so you can swap providers per-agent later
-without touching the others.
-"""
 
 import json
 from provider import ask_gemini, ask_groq, ask_critic
