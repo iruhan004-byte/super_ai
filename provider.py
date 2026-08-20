@@ -1,7 +1,4 @@
-"""
-Thin wrappers around Gemini (Google AI Studio), Groq, and DeepSeek (via OpenRouter).
-Requires: pip install google-genai groq requests
-"""
+
 
 import requests
 from google import genai
@@ -12,15 +9,10 @@ from config import (
     GEMINI_MODEL, GROQ_MODEL, CRITIC_MODEL,
 )
 
-# Clients are created lazily (on first use) so a missing key gives a clear
-# error message from the function that needs it, instead of crashing on
-# import before you even get to run anything.
 _gemini_client = None
 _groq_client = None
 
-# Disabling AFC (Automatic Function Calling) in generate_content config.
-# We never pass tools, so AFC is irrelevant — disabling it prevents the SDK
-# from emitting its "direct AFC not recommended" warning.
+
 _NO_AFC = genai.types.GenerateContentConfig(
     automatic_function_calling=genai.types.AutomaticFunctionCallingConfig(
         disable=True,
