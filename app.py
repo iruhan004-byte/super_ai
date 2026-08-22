@@ -198,7 +198,7 @@ if submitted and query.strip():
 
     col_info, col_dl = st.columns(2)
     with col_info:
-        st.info(f"💾 Saved to `{filename}`")
+        st.info(f"💾 Saved to `{filename}`") 
     with col_dl:
         st.download_button(
             label="⬇️ Download report (.md)",
