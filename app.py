@@ -1,5 +1,3 @@
-
-
 import os
 import sys
 from datetime import datetime
@@ -7,11 +5,9 @@ from pathlib import Path
 
 import streamlit as st
 
-# UTF-8 safety for Windows terminals
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# Page config (must be first Streamlit call)
 st.set_page_config(
     page_title="HYBRID AI System",
     page_icon="🔬",
@@ -19,7 +15,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Project imports after page config
 from agents import (
     plan_sub_questions,
     research_sub_question,
@@ -33,13 +28,11 @@ from config import (
     MAX_SUB_QUESTIONS, RESULTS_PER_QUERY,
 )
 
-# ── SIDEBAR ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.title("🔬 AI Research")
     st.caption("Multi-agent research pipeline")
     st.divider()
 
-    # API key status
     st.subheader("🔑 API Keys")
     for label, key in [
         ("Gemini", GEMINI_API_KEY),
@@ -53,7 +46,6 @@ with st.sidebar:
 
     st.divider()
 
-    # Model info
     st.subheader("🤖 Models")
     critic_short = CRITIC_MODEL.split("/")[-1] if "/" in CRITIC_MODEL else CRITIC_MODEL
     st.markdown(f"""
@@ -65,13 +57,11 @@ with st.sidebar:
 """)
     st.divider()
 
-    # Settings
     st.subheader("⚙️ Settings")
     st.markdown(f"- Max sub-questions: **{MAX_SUB_QUESTIONS}**")
     st.markdown(f"- Results per query: **{RESULTS_PER_QUERY}**")
     st.divider()
 
-    # Past reports browser
     st.subheader("📂 Past Reports")
     reports_dir = Path(SAVE_REPORTS_TO)
     if reports_dir.exists():
@@ -92,7 +82,6 @@ with st.sidebar:
     else:
         st.caption("No saved reports yet.")
 
-# ── MAIN HEADER ───────────────────────────────────────────────────────────────
 st.title("🔬 AI Research System")
 st.caption(
     "Ask a research question → **Planner** (Groq) breaks it into sub-queries → "
@@ -100,7 +89,6 @@ st.caption(
     "the report → **Critic** (OpenRouter) reviews it."
 )
 
-# API key guard
 missing = [name for name, key in [
     ("GEMINI_API_KEY", GEMINI_API_KEY),
     ("GROQ_API_KEY", GROQ_API_KEY),
@@ -113,7 +101,6 @@ if missing:
     )
     st.stop()
 
-# ── LOADED PAST REPORT ────────────────────────────────────────────────────────
 if "loaded_report" in st.session_state:
     st.info(f"📄 Showing saved report: `{st.session_state['loaded_report_name']}`")
     st.markdown(st.session_state["loaded_report"])
@@ -123,7 +110,6 @@ if "loaded_report" in st.session_state:
         st.rerun()
     st.stop()
 
-# ── INPUT FORM ────────────────────────────────────────────────────────────────
 with st.form("research_form"):
     query = st.text_input(
         "Research question",
@@ -135,10 +121,8 @@ if submitted and not query.strip():
     st.warning("⚠️ Please enter a research question.")
     st.stop()
 
-# ── PIPELINE ──────────────────────────────────────────────────────────────────
 if submitted and query.strip():
 
-    # Stage 1 — Planner
     with st.status("🧠 Stage 1 / 4 — Planner (Groq)", expanded=True) as s:
         st.write("Breaking your question into focused sub-queries…")
         sub_questions = plan_sub_questions(query)
@@ -147,7 +131,6 @@ if submitted and query.strip():
             st.markdown(f"&nbsp;&nbsp;`{i}.` {q}")
         s.update(label="✅ Planner done", state="complete", expanded=False)
 
-    # Stage 2 — Researcher
     research_data = []
     with st.status("🔎 Stage 2 / 4 — Researcher (DuckDuckGo)", expanded=True) as s:
         for i, q in enumerate(sub_questions, 1):
@@ -157,13 +140,11 @@ if submitted and query.strip():
             st.caption(f"  → {len(result['sources'])} source(s) gathered")
         s.update(label="✅ Research done", state="complete", expanded=False)
 
-    # Stage 3 — Synthesizer
     with st.status("✍️ Stage 3 / 4 — Synthesizer (Gemini)", expanded=True) as s:
         st.write("Writing report from all gathered evidence…")
         report = synthesize_report(query, research_data)
         s.update(label="✅ Report written", state="complete", expanded=False)
 
-    # Stage 4 — Critic
     with st.status("🔬 Stage 4 / 4 — Critic (OpenRouter)", expanded=True) as s:
         st.write("Reviewing for gaps, contradictions, and unsupported claims…")
         critique = critique_report(query, report)
@@ -172,7 +153,6 @@ if submitted and query.strip():
     st.success("🎉 Research pipeline complete!")
     st.divider()
 
-    # ── Results ───────────────────────────────────────────────────────────────
     col_report, col_right = st.columns([7, 3], gap="large")
 
     with col_report:
@@ -194,7 +174,6 @@ if submitted and query.strip():
                     if snippet:
                         st.caption(snippet + "…")
 
-    # ── Save & download ────────────────────────────────────────────────────────
     st.divider()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     os.makedirs(SAVE_REPORTS_TO, exist_ok=True)
